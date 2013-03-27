@@ -73,7 +73,7 @@ for (n in 1:8) {
     }
   }
   names(tab) <- c("Abstention", "BN", "Mancel", "Italiani")
-  tab <- apply(tab,  2, function(x) sprintf("%1.2f%%", 100*x))
+  tab <- apply(tab,  2, function(x) sprintf("%1.0f%%", 100*x))
   tab <- cbind(tab, Voix = apply(res[index[[n]],c("abs", "BN", "Mancel", "Ripart", "Lesaege", "Ramel", "Potchtovik", "Houssin", "Italiani")],2,sum))
   tab <- rbind(tab, Voix = c(apply(res[index[[n]],c("abs2", "B2", "Mancel2", "Italiani2")],2,sum), sum(res$Inscrits[index[[n]]])))
   write.csv(resultats[[n]], file=paste(cantons[n], ".csv", sep="")) 
