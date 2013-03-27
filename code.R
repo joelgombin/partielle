@@ -57,4 +57,24 @@ plot(density(summary(dbuf$draws$Beta[,paste("beta.abs.abs2.",1:196, sep="")])$st
 
 # représentation graphique du lien entre vote PS et vote FN
 library(ggplot2)
-ggplot(res, aes(PS.ins, progFN)) + geom_point(aes(size=Inscrits), alpha=0.4) + scale_size(trans="log", breaks=c(50,100,500,1000)) +theme_bw() + geom_smooth(method="lm") + xlab("Vote Sylvie Houssin") + ylab("Progression de Florence Italiani")
+ggplot(res, aes(PS.ins, progFN)) + geom_point(aes(size=Inscrits), alpha=0.4) + scale_size(trans="log", breaks=c(50,100,500,1000))+theme_bw() + geom_smooth(method="lm") + xlab("Vote Sylvie Houssin") + ylab("Progression de Florence Italiani")
+
+# pour les cantons
+cantons <- c("Aunueil", "Beauvais", "Chaumont", "Le Coudray", "Formerie", "Grandvilliers", "Noailles", "Songeons")
+index <- list(1:21, 22:36, 37:74, 75:95, 96:119, 120:143, 144:168, 169:196)
+resultats <- list()
+for (n in 1:8) {
+  resultats[[n]] <- array(dim=c(length(tour1), length(tour2)))
+  dimnames(resultats[[n]])[[1]] <- names(res)[c(34, 5,7:13)]
+  dimnames(resultats[[n]])[[2]] <- names(res)[c(35,16,18,19)]
+  for (i in tour1) {
+    for (j in tour2) {
+      resultats[[n]][i,j] <- weighted.mean(summary(dbuf$draws$Beta[,paste("beta.",i,".",j,".",index[[n]], sep="")])$statistics[,1], res$Inscrits[index[[n]]])
+    }
+  }
+  names(tab) <- c("Abstention", "BN", "Mancel", "Italiani")
+  tab <- apply(tab,  2, function(x) sprintf("%1.2f%%", 100*x))
+  tab <- cbind(tab, Voix = apply(res[index[[n]],c("abs", "BN", "Mancel", "Ripart", "Lesaege", "Ramel", "Potchtovik", "Houssin", "Italiani")],2,sum))
+  tab <- rbind(tab, Voix = c(apply(res[index[[n]],c("abs2", "B2", "Mancel2", "Italiani2")],2,sum), sum(res$Inscrits[index[[n]]])))
+  write.csv(resultats[[n]], file=paste(cantons[n], ".csv", sep="")) 
+}
